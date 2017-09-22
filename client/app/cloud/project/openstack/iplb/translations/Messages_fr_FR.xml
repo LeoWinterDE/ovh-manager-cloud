@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<translations>
+   <translation id="cpc_iplb_demo">Vous aurez ici la possibilité d'importer vos ips loadbalancing d'OVH dans Openstack. <br/> Vous pourrez alors utiliser openstack pour gérer vos ips loadbalancing</translation>
+
+   <translation id="cpc_iplb_name">Nom</translation>
+
+   <translation id="cpc_iplb_status">État</translation>
+   <translation id="cpc_iplb_status_validated">Prêt</translation>
+   <translation id="cpc_iplb_status_created">En cours de création</translation>
+   <translation id="cpc_iplb_status_error">En erreur</translation>
+
+   <translation id="cpc_iplb_empty">Vous n'avez pas encore importé d'ip loadbalancing.</translation>
+   <translation id="cpc_iplb_error">Oups, nous n'arrivons pas à récupérer la liste de vos ips loadbalancing.</translation>
+   <translation id="openstackiplb_iplb_order_info">Vous devez commander une ip loadbalancing pour pouvoir l'importer dans openstack.</translation>
+   <translation id="openstackiplb_iplb_order_button">Order</translation>
+   <translation id="openstackiplb_iplb_import_button">Importer</translation>
+
+   <translation id="cpc_iplb_search_button">Rechercher</translation>
+
+   <translation id="cpc_iplb_delete_success">Cette ip loadbalancing n'est maintenant plus disponible.</translation>
+   <translation id="cpc_iplb_delete_error">Oups, nous n'arrivons pas à détacher cette ip loadbalancing !</translation>
+
+   <translation id="cpc_iplb_delete_button">Détacher l'ip loadbalancing</translation>
+   <translation id="cpc_iplb_delete_cancel_button">Ne pas détacher l'ip loadbalancing</translation>
+   <translation id="cpc_iplb_delete_confirm_button">Confirmer le détachement de l'ip loadbalancing</translation>
+
+   <translation id="cpc_iplb_delete_button_plural">Détacher les {{nbSnapshots}} ips loadbalancing</translation>
+   <translation id="cpc_iplb_delete_cancel_button_plural">Ne pas détacher les ips loadbalancing</translation>
+
+   <translation id="cpc_iplb_delete_success_plural">Les {{nbSnapshots}} ips loadbalancing sélectionnées ne sont maintenant plus disponibles.</translation>
+   <translation id="cpc_iplb_delete_error_plural">Oups, nous n'arrivons pas à détacher {{nbSnapshots}} ips loadbalancing !</translation>
+   <translation id="cpc_iplb_delete_error_one">Oups, nous n'arrivons pas à détacher une ips loadbalancing !</translation>
+
+
+</translations>

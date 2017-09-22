@@ -1,0 +1,152 @@
+<div id="cloud-project-openstack-iplb" class="row">
+    <div class="col-xs-12">
+            <form  data-ng-submit="CloudProjectOpenstackIplbCtrl.importIplb()" class="bottom-space-m16 form form-inline" data-ng-if="!CloudProjectOpenstackIplbCtrl.loaders.table.ipLoadbalancing && CloudProjectOpenstackIplbCtrl.table.ipLoadbalancing.length">
+                <div flat-input-container="" class="bottom-space-p8 form-group">
+                    <select id="selectRightType" name="selectIplb" class="form-control flat-select ng-pristine ng-valid ng-not-empty ng-touched" data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.table.ipLoadbalancing" data-ng-model="CloudProjectOpenstackIplbCtrl.form.ipLoadbalancing">
+                        <option data-ng-repeat="iplb in CloudProjectOpenstackIplbCtrl.table.ipLoadbalancing" value="{{iplb}}">
+                            {{iplb}}
+                        </option>
+                    </select>
+                </div>
+                <button
+                class="btn btn-primary"
+                data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.table.ipLoadbalancing ||
+                CloudProjectOpenstackIplbCtrl.table.ipLoadbalancing === null"
+                write-right-required
+                type="submit">
+                <i class="glyphicon glyphicon-plus right-space-m8"></i>
+                <span translate="openstackiplb_iplb_import_button"></span>
+            </button>
+        </form>
+
+        <p data-ng-if="!CloudProjectOpenstackIplbCtrl.loaders.table.ipLoadbalancing && !CloudProjectOpenstackIplbCtrl.table.ipLoadbalancing.length"
+        class="alert alert-info"><span translate="openstackiplb_iplb_order_info"></span> <a href="#" translate="openstackiplb_iplb_order_button" class="btn btn-primary"></a></p>
+
+        <!-- IPLB TABLE -->
+        <div class="table-responsive-vertical shadow-z-1 top-space-m12">
+            <table class="table table-pretty table-hover table-striped iplb-table"
+                style="position:relative;">
+                <thead>
+                    <tr>
+                        <th>
+                            <button class="no-style"
+                                type="button"
+                                data-ng-click="CloudProjectOpenstackIplbCtrl.orderBy('name')"
+                                data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.remove.iplb">
+                                <span translate="cpc_iplb_name"></span>
+                                <span class="table-pretty-filter"
+                                    data-ng-show="CloudProjectOpenstackIplbCtrl.table.iplb.length">
+                                    <i data-ng-show="CloudProjectOpenstackIplbCtrl.order.by !== 'name'" class="fa fa-sort"></i>
+                                    <i data-ng-show="CloudProjectOpenstackIplbCtrl.order.by === 'name' && CloudProjectOpenstackIplbCtrl.order.reverse" class="fa fa-sort-desc"></i>
+                                    <i data-ng-show="CloudProjectOpenstackIplbCtrl.order.by === 'name' && !CloudProjectOpenstackIplbCtrl.order.reverse" class="fa fa-sort-asc"></i>
+                                </span>
+                            </button>
+                        </th>
+                        <th class="text-center">
+                            <button class="no-style"
+                                type="button"
+                                data-ng-click="CloudProjectOpenstackIplbCtrl.orderBy('status')"
+                                data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.remove.iplb">
+                                <span translate="cpc_iplb_status"></span>
+                                <span class="table-pretty-filter"
+                                    data-ng-show="CloudProjectOpenstackIplbCtrl.table.iplb.length">
+                                    <i data-ng-show="CloudProjectOpenstackIplbCtrl.order.by !== 'status'" class="fa fa-sort"></i>
+                                    <i data-ng-show="CloudProjectOpenstackIplbCtrl.order.by === 'status' && CloudProjectOpenstackIplbCtrl.order.reverse" class="fa fa-sort-desc"></i>
+                                    <i data-ng-show="CloudProjectOpenstackIplbCtrl.order.by === 'status' && !CloudProjectOpenstackIplbCtrl.order.reverse" class="fa fa-sort-asc"></i>
+                                </span>
+                            </button>
+                        </th>
+                        <th class="text-center" style="width: 70px;" write-right-required>
+                            <button data-ng-click="CloudProjectOpenstackIplbCtrl.getIplb(true)"
+                                type="button"
+                                data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.remove.iplb"
+                                class="no-style">
+                                <i class="glyphicon glyphicon-refresh"></i>
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody data-ng-show="CloudProjectOpenstackIplbCtrl.loaders.table.iplb">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <spinner></spinner>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody data-ng-if="!CloudProjectOpenstackIplbCtrl.loaders.table.iplb && CloudProjectOpenstackIplbCtrl.table.iplb.length === 0">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <span translate="cpc_iplb_empty"></span>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody data-ng-if="!CloudProjectOpenstackIplbCtrl.loaders.table.iplb && CloudProjectOpenstackIplbCtrl.table.iplb === null">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <i class="fa fa-bug"></i>
+                            <span translate="cpc_iplb_error"></span>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody data-ng-hide="CloudProjectOpenstackIplbCtrl.loaders.table.iplb">
+                    <tr data-ng-repeat="iplb in CloudProjectOpenstackIplbCtrl.table.iplb track by iplb.id">
+                        <td data-title="{{::'cpc_iplb_name' | translate}}">
+                            <label data-ng-class="{'opacity2-leave' : CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId === iplb.id,
+                                                'opacity2-enter' : CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId !== iplb.id}"
+                                   for="{{::'ss_' + iplb.id}}">
+                                   <span data-ng-bind="::iplb.iplb"></span>
+                            </label>
+                        </td>
+                        <td data-title="{{::'cpc_iplb_status' | translate}}" class="text-center">
+                            <span class="ip-text" data-ng-if="iplb.status!=='validated'">
+                                <spinner size="16"></spinner>
+                            </span>
+                            <span data-ng-class="{'opacity2-leave' : CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId === iplb.id,
+                                                'opacity2-enter' : CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId !== iplb.id}"
+                                 data-ng-bind="'cpc_iplb_status_' + iplb.status | translate">
+                            </span>
+                        </td>
+
+                        <td data-title="" class="text-center" write-right-required>
+
+                            <div data-ng-show="CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId === iplb.id"
+                                class="text-center animate-fadeInRight-enter animate-fadeOutLeft-leave full-width"
+                                style="left:0; position:absolute; z-index:1000; margin-top: -6px;">
+
+                                <button class="btn btn-default"
+                                    type="button"
+                                    data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.remove.iplb"
+                                    data-ng-click="CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId = null">
+                                    <i class="glyphicon glyphicon-remove right-space-m8"></i>
+                                    <span translate="cpc_iplb_delete_cancel_button"></span>
+                                </button>
+                                <button class="btn btn-danger"
+                                    type="button"
+                                    data-ng-click="CloudProjectOpenstackIplbCtrl.deleteIplb(iplb)"
+                                    data-ng-disabled="CloudProjectOpenstackIplbCtrl.loaders.remove.iplb">
+                                    <i class="glyphicon glyphicon-trash right-space-m8"></i>
+                                    <span translate="cpc_iplb_delete_confirm_button"></span>
+                                    <spinner name="bubbles-fff-d34936-16" data-ng-show="CloudProjectOpenstackIplbCtrl.loaders.remove.iplb"></spinner>
+                                </button>
+                            </div>
+
+                            <div data-ng-class="{'opacity2-leave' : CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId === iplb.id,
+                                                'opacity2-enter' : CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId !== iplb.id}">
+                                <button class="no-style"
+                                    type="button"
+                                    title="{{ (iplb.isInstalledOnVm ? 'cpc_iplb_status_cannot_delete' : 'cpc_iplb_delete_button') | translate}}"
+                                    data-ng-click="CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId = iplb.id"
+                                    data-ng-disabled="CloudProjectOpenstackIplbCtrl.toggle.iplbDeleteId === iplb.id
+                                                    || CloudProjectOpenstackIplbCtrl.loaders.remove.iplb
+                                                    ">
+                                    <i class="glyphicon glyphicon-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+</div>
+</div>
