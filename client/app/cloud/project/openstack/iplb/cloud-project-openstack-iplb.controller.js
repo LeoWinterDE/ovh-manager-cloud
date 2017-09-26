@@ -88,7 +88,7 @@ angular.module("managerApp")
                 self.table.iplb = result;
                 return result;
             }).catch(function (err) {
-                self.table.iplb = [];
+                self.table.iplb = null;
                 Toast.error( [$translate.instant('cpc_iplb_error'), err.data && err.data.message || ''].join(' '));
             }).finally(function () {
                 self.loaders.table.iplb = false;
