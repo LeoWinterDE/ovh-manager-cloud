@@ -11,6 +11,7 @@
 
    <translation id="cpc_iplb_empty">Vous n'avez pas encore importé d'ip loadbalancing.</translation>
    <translation id="cpc_iplb_error">Oups, nous n'arrivons pas à récupérer la liste de vos ips loadbalancing.</translation>
+   <translation id="cpc_iplb_error_import">Oups, nous n'avons pas réussi à importer votre ip loadbalancing.</translation>
    <translation id="openstackiplb_iplb_order_info">Vous devez commander une ip loadbalancing pour pouvoir l'importer dans openstack.</translation>
    <translation id="openstackiplb_iplb_order_button">Order</translation>
    <translation id="openstackiplb_iplb_import_button">Importer</translation>

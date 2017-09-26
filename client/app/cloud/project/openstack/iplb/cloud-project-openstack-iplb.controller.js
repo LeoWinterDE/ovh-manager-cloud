@@ -3,7 +3,7 @@
 angular.module("managerApp")
   .controller("CloudProjectOpenstackIplbCtrl",
     function (OvhApiCloudProjectIplb, OvhApiIpLoadBalancing,
-              $translate, $window, Toast, $scope, $filter, $q, $timeout, CloudProjectOrchestrator, $state,
+              $translate, $window, $location, Toast, $scope, $filter, $q, $timeout, CloudProjectOrchestrator, $state,
               $stateParams, Poller) {
 
     var self = this,
@@ -45,8 +45,12 @@ angular.module("managerApp")
         var ipLoadbalancingPromise = self.getIpLoadbalancing(true); // set clear cache to true because we need fresh data
         if ($stateParams.validate) {
             self.loaders.validate = true
-            validatePromise = OvhApiCloudProjectIplb.Lexi().validate({ serviceName : serviceName, id : $stateParams.validate }, {}).$promise.catch(function (err) {
-                Toast.error( [$translate.instant('cpc_iplb_error'), err.data && err.data.message || ''].join(' '));
+            validatePromise = OvhApiCloudProjectIplb.Lexi().validate({ serviceName : serviceName, id : $stateParams.validate }, {}).$promise
+            .then(function () {
+                $location.search("validate",null);
+            })
+            .catch(function (err) {
+                Toast.error( [$translate.instant('cpc_iplb_error_import'), err.data && err.data.message || ''].join(' '));
             }).finally(function () { self.loaders.validate = false; });
             $stateParams.validate = "";
         }
@@ -118,13 +122,11 @@ angular.module("managerApp")
     self.importIplb = function () {
         if (!self.loaders.form.ipLoadbalancing) {
             self.loaders.form.ipLoadbalancing = true;
-            OvhApiCloudProjectIplb.Lexi().post({ serviceName : serviceName }, {ipLoadbalancingServiceName : self.form.ipLoadbalancing }).$promise
+            OvhApiCloudProjectIplb.Lexi().post({ serviceName : serviceName }, {ipLoadbalancingServiceName : self.form.ipLoadbalancing, redirection : $location.absUrl().replace(/\?.*$/,"") + "?validate=%id" }).$promise
             .then(function (result) {
                 $window.location.href=result.validationUrl;
             }).catch(function (err) {
                 Toast.error( [$translate.instant('cpc_iplb_error'), err.data && err.data.message || ''].join(' '));
-            }).finally(function () {
-                self.loaders.form.ipLoadbalancing = false;
             });
         }
     }
@@ -150,6 +152,7 @@ angular.module("managerApp")
             var promiseDelete = deleteIplb(iplb.id);
             promiseDelete.then(function () {
                 self.getIplb(true);
+                self.getIpLoadbalancing(true);
                 Toast.success($translate.instant('cpc_iplb_delete_success'));
             }, function (err) {
                 Toast.error( [$translate.instant('cpc_iplb_delete_error'), err.data && err.data.message || ''].join(' '));
