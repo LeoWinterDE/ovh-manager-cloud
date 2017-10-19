@@ -129,7 +129,6 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
 
         // Configure the HTTP(80) loadbalancer
         var configLoadBalancer = _.values(self.form.servers).length && _.reduce(self.form.servers, (res,value) => res && value, true) || _.values(self.attachedServers).length > 0
-        console.log("need config ?", configLoadBalancer, self.form.servers, self.attachedServers)
         if (self.loadbalancer.status !== "custom" && configLoadBalancer) {
             if(self.loadbalancer.status === "available") {
                 // Create farm and front
@@ -174,7 +173,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             if (modified) {
                 promise = promise.then(() => OvhApiIpLoadBalancing.Lexi().refresh({ serviceName : loadbalancerId }, {}).$promise);
                 promise = promise.then(() => self.tasks.load())
-                promise = promise.then(() => CloudProjectComputeLoadbalancerService.getLoadbalancer(loadbalancerId)).then(l => self.loadblancer = l);
+                promise = promise.then(() => getLoadbalancer(true));
             }
         }
         // Configure the openstack importation
@@ -246,6 +245,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                if (res) {
                    self.tasks.data = _.filter(self.tasks.data, t =>  t.id !== task.id )
                }
+               return res;
            }
        });
     }
