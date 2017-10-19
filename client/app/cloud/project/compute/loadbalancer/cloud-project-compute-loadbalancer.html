@@ -60,7 +60,7 @@
                         class="oui-table__row">
 
                         <td data-title="{{::'cpc_loadbalancer_name' | translate}}" class="oui-table__cell">
-                            <span data-ng-bind="::loadbalancer.serviceName">
+                            <span>{{loadbalancer.displayName || loadbalancer.serviceName}}
                             </span>
                         </td>
 
