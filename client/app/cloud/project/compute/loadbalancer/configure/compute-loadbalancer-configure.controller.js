@@ -1,4 +1,4 @@
-angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigureCtrl", function ($anchorScroll, $scope, $stateParams, $q, $location, $window, $translate,  CloudProjectComputeLoadbalancerService, OvhApiIpLoadBalancing, OvhApiCloudProjectIplb, OvhApiCloudProject, ovhDocUrl, CloudMessage, IpLoadBalancerTaskService, ControllerHelper, CloudPoll) {
+angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigureCtrl", function ($anchorScroll, $scope, $stateParams, $q, $location, $window, $translate,  CloudProjectComputeLoadbalancerService, OvhApiIpLoadBalancing, OvhApiCloudProjectIplb, OvhApiCloudProject, ovhDocUrl, CloudMessage, IpLoadBalancerTaskService, ControllerHelper, CloudPoll, Toaster) {
     var self = this;
 
     var serviceName = $stateParams.projectId,
@@ -32,6 +32,15 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
 
 
     function init () {
+
+        // Get loadbalancer pending tasks and define poller
+        self.tasks = ControllerHelper.request.getArrayLoader({
+            loaderFunction: () => IpLoadBalancerTaskService.getTasks(loadbalancerId).then(tasks => _.filter(tasks, task => _.includes(["todo","doing"], task.status))),
+            successHandler: () => startTaskPolling()
+        });
+        self.tasks.load();
+
+
         var validatePromise;
         // Terminate validation if params exists
         if ($stateParams.validate) {
@@ -41,7 +50,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                 $location.search("validate",null);
                 self.toggle.updatedMessage = true;
             })
-            .catch(err => Toast.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' ')))
+            .catch(err => Toaster.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' ')))
             .finally(() => self.loaders.loadbalancer = false);
             $stateParams.validate = "";
         }
@@ -50,13 +59,6 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
         }
         // After validation, load the loadbalancer
         validatePromise.then(() => getLoadbalancer(true));
-
-        // Get loadbalancer pending tasks and define poller
-        self.tasks = ControllerHelper.request.getArrayLoader({
-            loaderFunction: () => IpLoadBalancerTaskService.getTasks(loadbalancerId).then(tasks => _.filter(tasks, task => _.includes(["todo","doing"], task.status))),
-            successHandler: () => startTaskPolling()
-        });
-        self.tasks.load();
 
         $scope.$on("$destroy", () => stopTaskPolling());
         initGuides();
@@ -126,20 +128,22 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
         var promise = $q.resolve("");
 
         // Configure the HTTP(80) loadbalancer
-        if (self.loadbalancer.status !== "custom") {
+        var configLoadBalancer = _.values(self.form.servers).length && _.reduce(self.form.servers, (res,value) => res && value, true) || _.values(self.attachedServers).length > 0
+        console.log("need config ?", configLoadBalancer, self.form.servers, self.attachedServers)
+        if (self.loadbalancer.status !== "custom" && configLoadBalancer) {
             if(self.loadbalancer.status === "available") {
                 // Create farm and front
                 promise = promise.then(() => OvhApiIpLoadBalancing.Farm().Http().Lexi().post({ serviceName : loadbalancerId}, {
                    displayName : `PublicCloud-${serviceName}`,
                    port : 80,
                    zone : "all",
-                }).then((farm) => self.loadbalancer.farm = farm));
-                promise = promise.then(() => OvhApiIpLoadBalancing.Front().Http().Lexi().post({ serviceName : loadbalancerId}, {
+               }).$promise.then((farm) => self.loadbalancer.farm = farm));
+                promise = promise.then(() => OvhApiIpLoadBalancing.Frontend().Http().Lexi().post({ serviceName : loadbalancerId}, {
                    displayName : `PublicCloud-${serviceName}`,
                    port : 80,
                    zone : "all",
                    defaultFarmId : self.loadbalancer.farm.farmId,
-               }).then((frontend) => self.loadbalancer.frontend = frontend));
+               }).$promise.then((frontend) => self.loadbalancer.frontend = frontend));
             }
 
             // Add or remove servers
@@ -154,7 +158,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                        port : 80,
                        address : ip,
                        status : "active",
-                   }));
+                   }).$promise);
                 }
                 if (!enable && self.attachedServers[ip]) {
                     modified = true;
@@ -162,7 +166,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                        serviceName : loadbalancerId,
                        serverId : self.attachedServers[ip].serverId,
                        farmId : self.loadbalancer.farm.farmId,
-                   }));
+                   }).$promise);
                 }
             })
 
@@ -170,6 +174,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             if (modified) {
                 promise = promise.then(() => OvhApiIpLoadBalancing.Lexi().refresh({ serviceName : loadbalancerId }, {}).$promise);
                 promise = promise.then(() => self.tasks.load())
+                promise = promise.then(() => CloudProjectComputeLoadbalancerService.getLoadbalancer(loadbalancerId)).then(l => self.loadblancer = l);
             }
         }
         // Configure the openstack importation
@@ -196,7 +201,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             self.toggle.updatedMessage = true;
             $location.hash("compute-loadbalancer-configure");
             $anchorScroll();
-        }).catch(err => Toast.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '))
+        }).catch(err => Toaster.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '))
         ).finally(() => self.loaders.form.loadbalancer = false);
     };
 

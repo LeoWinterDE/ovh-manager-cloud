@@ -22,11 +22,11 @@ angular.module("managerApp")
                     frontendId : frontendIds[0],
                 }).$promise || loadbalancer;
             }).then(function (frontend) {
-                if (frontend) {
+                if (frontend.frontendId) {
                     loadbalancer.frontend = frontend;
                 }
                 // Get default farm details
-                return frontend && frontend.defaultFarmId && OvhApiIpLoadBalancing.Farm().Http().Lexi().get({
+                return frontend.frontendId && frontend.defaultFarmId && OvhApiIpLoadBalancing.Farm().Http().Lexi().get({
                     serviceName : id,
                     farmId : frontend.defaultFarmId,
                 }).$promise || loadbalancer;
@@ -44,6 +44,7 @@ angular.module("managerApp")
             } else {
                 loadbalancer.status = "custom";
             }
+            console.log("loadbalancer ? ", loadbalancer);
             return loadbalancer;
         });
     }
