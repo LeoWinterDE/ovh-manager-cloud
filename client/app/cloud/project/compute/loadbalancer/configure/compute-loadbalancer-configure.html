@@ -3,8 +3,8 @@
     <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer" class="text-center">
         <oui-loader size="m" class="d-inline-block"></oui-loader>
     </div>
-    <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null">
-        Error !
+    <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null"
+    data-translate="cpc_loadbalancer_error">
     </div>
     <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage && !CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" data-translate="cpc_loadbalancer_configure_updated_message"
      class="oui-message"></div>
@@ -41,7 +41,7 @@
             <hr />
             <h3 data-translate="cpc_loadbalancer_configure_servers"></h3>
             <p class="cui-advanced-options" data-translate="cpc_loadbalancer_configure_servers_condition"></p>
-            <table class="oui-table" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.table.server">
+            <table class="oui-table" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.table.server !== null">
                 <thead class="oui-table__header">
                     <tr class="oui-table__row">
                         <th class="oui-table__cell"></th><th class="oui-table__cell">Name</th><th class="oui-table__cell">IP</th>

@@ -40,7 +40,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                 $location.search("validate",null);
                 self.toggle.updatedMessage = true;
             })
-            .catch(err => Toas.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' ')))
+            .catch(err => Toast.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' ')))
             .finally(() => self.loaders.loadbalancer = false);
             $stateParams.validate = "";
         }
@@ -278,6 +278,6 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
            self.poller.kill();
        }
     }
-    
+
     init();
 });
