@@ -1,14 +1,21 @@
 <div id="compute-loadbalancer-configure">
     <h2><a ui-sref="^.loadbalancer"><i class="glyphicon glyphicon-chevron-left"></i></a> <span data-translate="cpc_loadbalancer_configure_title"></span></h2>
-    <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer" class="text-center">
+    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer" class="text-center">
         <oui-loader size="m" class="d-inline-block"></oui-loader>
     </div>
-    <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null">
+    <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null">
         Error !
     </div>
-    <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage" data-translate="cpc_loadbalancer_configure_updated_message"
+    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage && !CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" data-translate="cpc_loadbalancer_configure_updated_message"
      class="oui-message"></div>
-    <form ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer !== null" data-ng-submit="CloudProjectComputeLoadbalancerConfigureCtrl.configure()">
+
+    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" class="cui-advanced-options">
+        <h4 data-translate="cpc_loadbalancer_configure_task_waiting"></h4>
+        <div data-ng-repeat="task in CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data track by $index" class="compute-loadbalancer-configure-tasks">
+            {{task.action}} : <cui-task-progress data-task="task"></cui-task-progress>
+        </div>
+    </div>
+    <form data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer !== null" data-ng-submit="CloudProjectComputeLoadbalancerConfigureCtrl.configure()">
         <div class="cui-advanced-options" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'custom'">
             <a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
             <p>
@@ -72,7 +79,7 @@
         </div>
 
         <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" class="validation">
-            <button class="oui-button oui-button_primary" data-translate="cpc_loadbalancer_configure_modify" type="submit"></button>
+            <button class="oui-button oui-button_primary" data-translate="cpc_loadbalancer_configure_modify" type="submit" data-ng-disabled="CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length"></button>
             <a class="oui-button oui-button_secondary" data-translate="cpc_loadbalancer_configure_cancel" ui-sref="^.loadbalancer"></a>
         </div>
         <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer || CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect">

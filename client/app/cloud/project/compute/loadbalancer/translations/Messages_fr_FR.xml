@@ -9,6 +9,7 @@
     <translation id="cpc_loadbalancer_openstack_status_validated">Autorisé</translation>
     <translation id="cpc_loadbalancer_openstack_status_expired">Expiré</translation>
     <translation id="cpc_loadbalancer_openstack_status_created">Non autorisé</translation>
+    <translation id="cpc_loadbalancer_openstack_status_not_imported">Non autorisé</translation>
     <translation id="cpc_loadbalancer_status">Status</translation>
     <translation id="cpc_loadbalancer_status_custom">Configuration avancée</translation>
     <translation id="cpc_loadbalancer_status_deployed">Configuré</translation>
@@ -19,7 +20,8 @@
 
     <translation id="cpc_loadbalancer_configure_title">Configurer le Load Balancer</translation>
     <translation id="cpc_loadbalancer_configure_advanced">Mode avancé</translation>
-    <translation id="cpc_loadbalancer_configure_updated_message">La configuration du Load Balancer a bien été mise à jour</translation>
+    <translation id="cpc_loadbalancer_configure_updated_message">La configuration du Load Balancer a bien été mise à jour.</translation>
+    <translation id="cpc_loadbalancer_configure_task_waiting">Déploiement du Load Balancer en cours...</translation>
     <translation id="cpc_loadbalancer_configure_loadbalancer">Load Balancer</translation>
     <translation id="cpc_loadbalancer_configure_adresse">Adresse IP :</translation>
     <translation id="cpc_loadbalancer_configure_frontend">Frontend</translation>

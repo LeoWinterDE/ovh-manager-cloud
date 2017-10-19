@@ -1,7 +1,7 @@
 "use strict";
 
 angular.module("managerApp")
-  .controller("CloudProjectComputeLoadbalancerCtrl", function ($q, $scope, $translate, CloudProjectComputeLoadbalancerService, OvhApiCloudProjectIplb, OvhApiIpLoadBalancing, ControllerHelper, CloudMessage, $stateParams) {
+  .controller("CloudProjectComputeLoadbalancerCtrl", function ($q, $scope, $translate, CloudProjectComputeLoadbalancerService, OvhApiCloudProjectIplb, OvhApiIpLoadBalancing, ControllerHelper, CloudMessage, $stateParams, OvhApiMe, URLS) {
 
     var self = this,
         serviceName = $stateParams.projectId;
@@ -11,6 +11,10 @@ angular.module("managerApp")
         loadbalancer : [],
         loadbalancerFilter: []
     };
+
+    // Order link
+    self.urls = URLS;
+    self.locale = "";
 
     self.order = {
         by      : 'serviceName',
@@ -26,40 +30,15 @@ angular.module("managerApp")
 
     var unsubscribeSearchEvent;
 
-    //loadbalancer model to add
-    function initNewLoadbalancer () {
-        self.loadbalancerAdd = {
-            serviceName : serviceName,
-            name : null,
-            publicKey  : null
-        };
-    }
-
     function init () {
-        self.getLoadbalancers();
-
-        initNewLoadbalancer();
+        self.getLoadbalancers(true);
+        // Init locale for order link
+        OvhApiMe.Lexi().get().$promise.then((user) => self.locale = user.ovhSubsidiary.toUpperCase());
 
     }
 
-
-    function filterLoadbalancers () {
-        if (self.table.loadbalancer.length){
-            self.orderBy();
-        }
-    }
-
-    //---------TOOLS---------
-
-    self.toggleAddLoadbalancer = function () {
-        if (self.toggle.openAddLoadbalancer) {
-            initNewLoadbalancer();
-        }
-        self.toggle.openAddLoadbalancer = !self.toggle.openAddLoadbalancer;
-    };
 
     //---------ORDER---------
-
     self.orderBy = function (by) {
         if (by) {
             if (self.order.by === by) {
@@ -70,16 +49,6 @@ angular.module("managerApp")
         }
     };
 
-    self.selectLoadbalancer = function(id, active){
-        if (active) {
-            setTimeout(function(){
-                var areaheight=$('#loadbalancerkey_'+ id).prop('scrollHeight');
-                $('#loadbalancerkey_'+ id).height(areaheight).select();
-            }, 0);
-        }
-    };
-
-    //---------SSH---------
 
     self.getLoadbalancers = function (clearCache) {
         if (!self.loaders.table.loadbalancer) {
@@ -88,29 +57,30 @@ angular.module("managerApp")
                 OvhApiCloudProjectIplb.Lexi().resetQueryCache();
                 OvhApiIpLoadBalancing.Lexi().resetQueryCache();
             }
-            $q.all([
-                OvhApiIpLoadBalancing.Lexi().query().$promise.then(function (response) {
-                    return $q.all(
+            $q.all({
+                loadbalancers :
+                    OvhApiIpLoadBalancing.Lexi().query().$promise.then((response) => $q.all(
                         _.map(response, CloudProjectComputeLoadbalancerService.getLoadbalancer)
-                    );
-                }),
-                OvhApiCloudProjectIplb.Lexi().query({
-                    serviceName : serviceName
-                }).$promise.then(function (response) {
-                    return $q.all(
-                        _.map(response, function (id) {
-                            return OvhApiCloudProjectIplb.Lexi().get({
+                    )),
+                laodbalancersImportedArray :
+                    OvhApiCloudProjectIplb.Lexi().query({
+                        serviceName : serviceName
+                    }).$promise.then(ids => $q.all(
+                            _.map(ids, id =>
+                                OvhApiCloudProjectIplb.Lexi().get({
                                     serviceName : serviceName,
                                     id : id,
-                                }).$promise;
-                        })
-                    );
-                }),
-            ]).then(function (loadbalancers) {
-                // Set openstack status
+                                }).$promise
+                            )
+                        )
+                    )
+            }).then(({loadbalancers, laodbalancersImportedArray}) => {
+                // Create a map of imported loadbalancers
                 var loadBalancerImported = {}
-                _.forEach(loadbalancers[1], function(lb) { loadBalancerImported[lb.iplb] = lb });
-                self.table.loadbalancer = _.map(loadbalancers[0], function (lb) {
+                _.forEach(laodbalancersImportedArray, function(lb) { loadBalancerImported[lb.iplb] = lb });
+
+                // Set openstack importation status
+                self.table.loadbalancer = _.map(loadbalancers, function (lb) {
                     if (loadBalancerImported[lb.serviceName]) {
                         lb.openstack = loadBalancerImported[lb.serviceName].status;
                     } else {
@@ -118,8 +88,9 @@ angular.module("managerApp")
                     }
                     return lb;
                 });
-                // Set cloud status
-                self.table.loadbalancer = _.map(self.table.loadbalancer, function (lb) {
+
+                // Set cloud simplified view status
+                self.table.loadbalancer = _.map(self.table.loadbalancer, lb => {
                     if (lb.frontend && lb.farm) {
                         lb.status = "deployed";
                     } else if (!lb.frontend && !lb.farm){
@@ -129,57 +100,12 @@ angular.module("managerApp")
                     }
                     return lb;
                 });
-                filterLoadbalancers();
-            }).catch(function (err){
+                self.orderBy();
+            }).catch( err => {
                 self.table.loadbalancer = null;
                 CloudMessage.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
-            })['finally'](function () {
-                self.loaders.table.loadbalancer = false;
-            });
+            }).finally(() => self.loaders.table.loadbalancer = false);
         }
-    };
-
-    self.postLoadbalancer = function () {
-        if (!self.loaders.add.loadbalancer) {
-            var uniq = _.find(self.table.loadbalancer, function (loadbalancerkey) {
-                return loadbalancerkey.name === self.loadbalancerAdd.name;
-            });
-
-            if (uniq) {
-                CloudMessage.error( $translate.instant('cpc_loadbalancer_add_submit_name_error'));
-                return;
-            }
-
-            self.loaders.add.loadbalancer = true;
-            OvhApiCloudProjectIplb.Lexi().save(self.loadbalancerAdd).$promise.then(function () {
-                self.toggleAddLoadbalancer();
-                self.getLoadbalancers(true);
-                CloudMessage.success($translate.instant('cpc_loadbalancer_add_submit_success'));
-            }, function (err){
-                CloudMessage.error( [$translate.instant('cpc_loadbalancer_add_submit_error'), err.data && err.data.message || ''].join(' '));
-            })['finally'](function () {
-                self.loaders.add.loadbalancer = false;
-            });
-        }
-    };
-
-    self.openDeleteLoadbalancer = function (loadbalancer) {
-        ControllerHelper.modal.showModal({
-            modalConfig: {
-                templateUrl: "app/cloud/project/compute/loadbalancer/delete/compute-loadbalancer-delete.html",
-                controller: "CloudProjectComputeLoadbalancerDeleteCtrl",
-                controllerAs: "$ctrl",
-                resolve: {
-                    serviceName: () => serviceName,
-                    loadbalancer: () => loadbalancer
-                }
-            },
-            successHandler: () => {
-                self.getLoadbalancers(true);
-                CloudMessage.success($translate.instant('cpc_loadbalancer_delete_success'));
-            },
-            errorHandler: (err) => CloudMessage.error( [$translate.instant('cpc_loadbalancer_delete_error'), err.data && err.data.message || ''].join(' '))
-        });
     };
 
     init();

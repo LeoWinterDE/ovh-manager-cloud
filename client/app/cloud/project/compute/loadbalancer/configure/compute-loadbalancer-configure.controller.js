@@ -1,9 +1,8 @@
-angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigureCtrl", function ($anchorScroll, $stateParams, $q, $location, $window, $translate,  CloudProjectComputeLoadbalancerService, OvhApiIpLoadBalancing, OvhApiCloudProjectIplb, OvhApiCloudProject, ovhDocUrl, CloudMessage) {
+angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigureCtrl", function ($anchorScroll, $scope, $stateParams, $q, $location, $window, $translate,  CloudProjectComputeLoadbalancerService, OvhApiIpLoadBalancing, OvhApiCloudProjectIplb, OvhApiCloudProject, ovhDocUrl, CloudMessage, IpLoadBalancerTaskService, ControllerHelper, CloudPoll) {
     var self = this;
 
-    var serviceName = $stateParams.projectId;
-
-    var loadbalancerId = $stateParams.loadbalancerId;
+    var serviceName = $stateParams.projectId,
+        loadbalancerId = $stateParams.loadbalancerId;
 
     self.loaders = {
         loadbalancer : false,
@@ -15,7 +14,11 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
         }
     };
 
+    // Data
     self.loadbalancer = {};
+    self.table = {
+        server : [],
+    };
 
     self.form = {
         openstack : false,
@@ -26,30 +29,35 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
         updatedMessage : false,
     };
 
-    self.table = {
-        server : [],
-    };
 
     function init () {
         var validatePromise;
-        console.log("validating ?", $stateParams.validate);
+        // Terminate validation if params exists
         if ($stateParams.validate) {
             self.loaders.loadbalancer = true
             validatePromise = OvhApiCloudProjectIplb.Lexi().validate({ serviceName : serviceName, id : $stateParams.validate }, {}).$promise
-            .then(function () {
+            .then(() => {
                 $location.search("validate",null);
                 self.toggle.updatedMessage = true;
             })
-            .catch(function (err) {
-                console.log("error", err);
-                Toast.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
-            }).finally(function () { self.loaders.loadbalancer = false; });
+            .catch(err => Toas.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' ')))
+            .finally(() => self.loaders.loadbalancer = false);
             $stateParams.validate = "";
         }
         else {
             validatePromise = Promise.resolve("");
         }
+        // After validation, load the loadbalancer
         validatePromise.then(() => getLoadbalancer(true));
+
+        // Get loadbalancer pending tasks and define poller
+        self.tasks = ControllerHelper.request.getArrayLoader({
+            loaderFunction: () => IpLoadBalancerTaskService.getTasks(loadbalancerId).then(tasks => _.filter(tasks, task => _.includes(["todo","doing"], task.status))),
+            successHandler: () => startTaskPolling()
+        });
+        self.tasks.load();
+
+        $scope.$on("$destroy", () => stopTaskPolling());
         initGuides();
     }
 
@@ -59,72 +67,64 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
         };
     }
 
+    // Get servers of the default default farm of the frontend
     function getAttachedServers() {
-        console.log("getAttachedServers",self.loadbalancer)
         if (!self.loadbalancer.farm) {
             return Promise.resolve([]);
         }
-        console.log("get servers");
         return OvhApiIpLoadBalancing.Farm().Http().Server().Lexi().query({
-         serviceName : loadbalancerId,
-         farmId : self.loadbalancer.farm.farmId,
-        }).$promise.then(function (servers) {
-         console.log("servers", servers);
-             return $q.all(
-                 _.map(servers, function (serverId) {
-                     return OvhApiIpLoadBalancing.Farm().Http().Server().Lexi().get({
+             serviceName : loadbalancerId,
+             farmId : self.loadbalancer.farm.farmId,
+        }).$promise
+        .then(serverIds =>
+            $q.all(
+                 _.map(serverIds, serverId => OvhApiIpLoadBalancing.Farm().Http().Server().Lexi().get({
                          serviceName : loadbalancerId,
                          farmId : self.loadbalancer.farm.farmId,
                          serverId : serverId,
-                     }).$promise;
-                 })
-             ).then((servers) => {
-                 console.log("servers", servers);
-                 return servers;
-             })
-        });
+                     }).$promise
+                 )
+            )
+        );
     }
 
+    // Get cloud servers to add in the loadbalancer
     function getServers() {
-        console.log("get servers");
         if (self.loaders.table.server) {
             return;
         }
         self.loaders.table.server = true;
-        return $q.all([
-            // Get cloud servers
-            OvhApiCloudProject.Instance().Lexi().query({ serviceName : serviceName }).$promise,
-            // Get attached servers
-            getAttachedServers(),
-        ]).then((result) => {
-            var servers = result[0];
+        return $q.all({
+            cloudServers : OvhApiCloudProject.Instance().Lexi().query({ serviceName : serviceName }).$promise,
+            attachedServers : getAttachedServers(),
+        }).then(({cloudServers, attachedServers}) => {
             self.attachedServers = {};
-            _.forEach(result[1], (attachedServer) => {
+            _.forEach(attachedServers, (attachedServer) => {
                 if(attachedServer.status == "active") {
                     self.attachedServers[attachedServer.address] = attachedServer;
                 }
             });
             self.form.servers = _.mapValues(self.attachedServers, (e) => e ? true : false );
+            // Generate array of object type as {ipv4, name}
             self.table.server =
-                _.flatten(_.map(servers, (server) =>
-                    _.map(_.filter(server.ipAddresses, { type : "public", version : 4 }), (adresse) => {
-                        return { label : server.name, ip : adresse.ip };
-                    })
+                _.flatten(_.map(cloudServers, (server) =>
+                    _.map(_.filter(server.ipAddresses, { type : "public", version : 4 }), (adresse) => ({ label : server.name, ip : adresse.ip }))
                 ));
          }).catch((err) => {
             self.table.server = null;
-            console.log("error", err)
             CloudMessage.error( [$translate.instant('cpc_server_error'), err.data && err.data.message || ''].join(' '))
         }).finally(() => self.loaders.table.server = false);
     }
 
+    // Configure and deploy the loadbalancer
     self.configure = function () {
         if (self.loaders.form.loadbalancer) {
             return;
         }
         self.loaders.form.loadbalancer = true;
-        console.log("sending form",self.loadBalancerImported, self.loadbalancer);
         var promise = $q.resolve("");
+
+        // Configure the HTTP(80) loadbalancer
         if (self.loadbalancer.status !== "custom") {
             if(self.loadbalancer.status === "available") {
                 // Create farm and front
@@ -141,11 +141,13 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                }).then((frontend) => self.loadbalancer.frontend = frontend));
             }
 
-            // Add servers
+            // Add or remove servers
+            var modified = false;
             _.forEach(self.form.servers, (enable, ip) => {
                 const server = _.find(self.table.server, { ip : ip })
                 const displayName = server ? server.label : null;
                 if (enable && !self.attachedServers[ip]) {
+                    modified = true;
                     promise = promise.then(() => OvhApiIpLoadBalancing.Farm().Http().Server().Lexi().post({ serviceName : loadbalancerId, farmId : self.loadbalancer.farm.farmId}, {
                        displayName : displayName,
                        port : 80,
@@ -154,6 +156,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                    }));
                 }
                 if (!enable && self.attachedServers[ip]) {
+                    modified = true;
                     promise = promise.then(() => OvhApiIpLoadBalancing.Farm().Http().Server().Lexi().delete({
                        serviceName : loadbalancerId,
                        serverId : self.attachedServers[ip].serverId,
@@ -161,7 +164,14 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                    }));
                 }
             })
+
+            // Deploy configuration
+            if (modified) {
+                promise = promise.then(() => OvhApiIpLoadBalancing.Lexi().refresh({ serviceName : loadbalancerId }, {}).$promise);
+                promise = promise.then(() => self.tasks.load())
+            }
         }
+        // Configure the openstack importation
         if (self.form.openstack && (!self.loadBalancerImported || self.loadBalancerImported.status !== "validated")) {
             // Need to remove old import to recreate it
             if (self.loadBalancerImported) {
@@ -244,5 +254,30 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             });
         }
     }
+
+
+    // Tasks poller
+    function startTaskPolling () {
+       stopTaskPolling();
+
+       self.poller = CloudPoll.pollArray({
+           items: self.tasks.data,
+           pollFunction: task => IpLoadBalancerTaskService.getTask(loadbalancerId, task.id),
+           stopCondition: task => {
+               var res =  _.includes(["done", "error"], task.status);
+               // Remove terminated tasks
+               if (res) {
+                   self.tasks.data = _.filter(self.tasks.data, t =>  t.id !== task.id )
+               }
+           }
+       });
+    }
+
+    function stopTaskPolling () {
+       if (self.poller) {
+           self.poller.kill();
+       }
+    }
+    
     init();
 });
