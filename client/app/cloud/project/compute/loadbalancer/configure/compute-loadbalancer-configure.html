@@ -1,0 +1,83 @@
+<div id="compute-loadbalancer-configure">
+    <h2><a ui-sref="^.loadbalancer"><i class="glyphicon glyphicon-chevron-left"></i></a> <span data-translate="cpc_loadbalancer_configure_title"></span></h2>
+    <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer" class="text-center">
+        <oui-loader size="m" class="d-inline-block"></oui-loader>
+    </div>
+    <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null">
+        Error !
+    </div>
+    <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage" data-translate="cpc_loadbalancer_configure_updated_message"
+     class="oui-message"></div>
+    <form ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer !== null" data-ng-submit="CloudProjectComputeLoadbalancerConfigureCtrl.configure()">
+        <div class="cui-advanced-options" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'custom'">
+            <a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
+            <p>
+                <strong data-translate="cpc_loadbalancer_key_explain_1"></strong>
+            </p>
+            <p data-translate="cpc_loadbalancer_key_explain_2">
+            </p>
+        </div>
+        <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'custom'">
+            <div><a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a></div>
+            <h3 data-translate="cpc_loadbalancer_configure_loadbalancer"></h3>
+            <p class="oui-field ">
+                <span class="oui-label" data-translate="cpc_loadbalancer_configure_adresse"></span>
+                <span class="oui-label">{{CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.ipv4}}</span>
+            </p>
+            <hr />
+            <h3 data-translate="cpc_loadbalancer_configure_frontend"></h3>
+            <p class="oui-field">
+                <span data-translate="cpc_loadbalancer_configure_protocole" class="oui-label"></span>
+                <span class="oui-label">HTTP</span>
+                <a class="oui-button oui-button_secondary" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
+            </p>
+            <hr />
+            <h3 data-translate="cpc_loadbalancer_configure_servers"></h3>
+            <p class="cui-advanced-options" data-translate="cpc_loadbalancer_configure_servers_condition"></p>
+            <table class="oui-table" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.table.server">
+                <thead class="oui-table__header">
+                    <tr class="oui-table__row">
+                        <th class="oui-table__cell"></th><th class="oui-table__cell">Name</th><th class="oui-table__cell">IP</th>
+                    </tr>
+                </thead>
+                <tbody class="oui-table__body">
+                <tr class="oui-table__row" data-ng-repeat="server in CloudProjectComputeLoadbalancerConfigureCtrl.table.server track by $index"
+                data-ng-click="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip] = !CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip]">
+                    <td class="oui-table__cell">
+                        <input type="checkbox" data-ng-click="$event.stopPropagation()" data-ng-model="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip]"/>
+                    </td>
+                    <td class="oui-table__cell"><span ng-if="server.label">{{server.label}}</span></td>
+                    <td class="oui-table__cell">{{server.ip}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.table.server && !CloudProjectComputeLoadbalancerConfigureCtrl.table.server">
+                <i class="fa fa-bug"></i>
+                <span translate="cpc_server_error"></span>
+            </div>
+            <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.table.server" class="text-center">
+                <oui-loader size="m" class="d-inline-block"></oui-loader>
+            </div>
+            <hr />
+
+        </div>
+
+        <h3 data-translate="cpc_loadbalancer_configure_openstack"></h3>
+        <p class="cui-advanced-options" data-translate="cpc_loadbalancer_configure_openstack_explanation" data-translate-values="{guideHorizon : CloudProjectComputeLoadbalancerConfigureCtrl.guides.horizon}"></p>
+        <div class="oui-field">
+            <label class="oui-label">
+                <input type="checkbox" data-ng-model="CloudProjectComputeLoadbalancerConfigureCtrl.form.openstack"/>
+                <span data-translate="cpc_loadbalancer_configure_openstack_activation"></span>
+            </label>
+        </div>
+
+        <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" class="validation">
+            <button class="oui-button oui-button_primary" data-translate="cpc_loadbalancer_configure_modify" type="submit"></button>
+            <a class="oui-button oui-button_secondary" data-translate="cpc_loadbalancer_configure_cancel" ui-sref="^.loadbalancer"></a>
+        </div>
+        <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer || CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect">
+            <oui-loader size="s" class="d-inline-block"></oui-loader>
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<translations>
+
+    <translation id="cpc_tab_loadbalancer">Load Balancer</translation>
+
+    <translation id="cpc_loadbalancer_order">Commander un Load Balancer</translation>
+    <translation id="cpc_loadbalancer_name">Load Balancer</translation>
+    <translation id="cpc_loadbalancer_openstack_status">Openstack Status</translation>
+    <translation id="cpc_loadbalancer_openstack_status_validated">Autorisé</translation>
+    <translation id="cpc_loadbalancer_openstack_status_expired">Expiré</translation>
+    <translation id="cpc_loadbalancer_openstack_status_created">Non autorisé</translation>
+    <translation id="cpc_loadbalancer_status">Status</translation>
+    <translation id="cpc_loadbalancer_status_custom">Configuration avancée</translation>
+    <translation id="cpc_loadbalancer_status_deployed">Configuré</translation>
+    <translation id="cpc_loadbalancer_status_available">Disponible</translation>
+
+    <translation id="cpc_loadbalancer_key_explain_1">Configuration avancée</translation>
+    <translation id="cpc_loadbalancer_key_explain_2">Le mode simplifié n'est pas disponible pour ce Load Balancer car il a été configuré de manière avancée.<br /> Vous devrez donc aller dans la page de configuration avancée pour ajouter des serveurs à votre Load Balancer.</translation>
+
+    <translation id="cpc_loadbalancer_configure_title">Configurer le Load Balancer</translation>
+    <translation id="cpc_loadbalancer_configure_advanced">Mode avancé</translation>
+    <translation id="cpc_loadbalancer_configure_updated_message">La configuration du Load Balancer a bien été mise à jour</translation>
+    <translation id="cpc_loadbalancer_configure_loadbalancer">Load Balancer</translation>
+    <translation id="cpc_loadbalancer_configure_adresse">Adresse IP :</translation>
+    <translation id="cpc_loadbalancer_configure_frontend">Frontend</translation>
+    <translation id="cpc_loadbalancer_configure_protocole">Protocole :</translation>
+    <translation id="cpc_loadbalancer_configure_servers">Serveurs</translation>
+    <translation id="cpc_loadbalancer_configure_servers_condition">Vous devez sélectionner au moins 1 serveur pour activer le loadbalancer.</translation>
+    <translation id="cpc_loadbalancer_configure_openstack">Openstack</translation>
+    <translation id="cpc_loadbalancer_configure_openstack_explanation">Vous pouvez configurer votre Load Balancer directement avec l'API d'openstack.<br />Pour cela vous devrez créer un utilisateur openstack en suivant <a href="{{guideHorizon}}">ce guide</a> pour vous connecter à la CLI ou à l'interface Horizon.</translation>
+    <translation id="cpc_loadbalancer_configure_openstack_activation">Autoriser mes utilisateurs Openstack à modifier ce Load Balancer.</translation>
+    <translation id="cpc_loadbalancer_configure_modify">Appliquer les modifications</translation>
+    <translation id="cpc_loadbalancer_configure_cancel">Annuler</translation>
+
+</translations>
