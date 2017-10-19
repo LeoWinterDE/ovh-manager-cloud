@@ -180,7 +180,7 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             promise = promise.then(() => {
                 // Import and redirect to auth page
                 return OvhApiCloudProjectIplb.Lexi().post({ serviceName : serviceName }, {ipLoadbalancingServiceName : loadbalancerId, redirection : $location.absUrl().replace(/\?.*$/,"") + "?validate=%id" }).$promise
-                .then(function (result) {
+                .then(result =>  {
                     $window.location.href=result.validationUrl;
                     self.loaders.form.redirect = true;
                 })
@@ -195,9 +195,8 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             self.toggle.updatedMessage = true;
             $location.hash("compute-loadbalancer-configure");
             $anchorScroll();
-        }).catch(function (err) {
-            Toast.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
-        }).finally(() => self.loaders.form.loadbalancer = false);
+        }).catch(err => Toast.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '))
+        ).finally(() => self.loaders.form.loadbalancer = false);
     };
 
     function getLoadbalancer(clearCache) {
@@ -207,49 +206,24 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
                 OvhApiCloudProjectIplb.Lexi().resetQueryCache();
                 OvhApiIpLoadBalancing.Lexi().resetQueryCache();
             }
-            return $q.all([
-                CloudProjectComputeLoadbalancerService.getLoadbalancer(loadbalancerId),
-                OvhApiCloudProjectIplb.Lexi().query({
-                    serviceName : serviceName
-                }).$promise.then(function (response) {
-                    return $q.all(
-                        _.map(response, function (id) {
-                            return OvhApiCloudProjectIplb.Lexi().get({
-                                    serviceName : serviceName,
-                                    id : id,
-                                }).$promise;
-                        })
-                    );
-                }),
-            ]).then(function (loadbalancers) {
-                console.log("found loadbalancer", loadbalancers);
-                // Set openstack status
-                self.loadbalancer = loadbalancers[0];
-                if (self.loadbalancer.frontend && self.loadbalancer.farm) {
-                    self.loadbalancer.status = "deployed";
-                } else if (!self.loadbalancer.frontend && !self.loadbalancer.farm){
-                    self.loadbalancer.status = "available";
-                } else {
-                    self.loadbalancer.status = "custom";
-                }
+            return $q.all({
+                loadbalancer : CloudProjectComputeLoadbalancerService.getLoadbalancer(loadbalancerId),
+                loadbalancersImported : CloudProjectComputeLoadbalancerService.getLoadbalancersImported(serviceName),
+            }).then(({loadbalancer, loadbalancersImported}) => {
+                self.loadbalancer = loadbalancer;
 
-                self.loadBalancerImported = _.find(loadbalancers[1], { iplb : loadbalancerId});
+                self.loadBalancerImported = loadbalancersImported[self.loadbalancer.serviceName];
                 if (!self.loadBalancerImported) {
                     return;
                 }
                 if (self.loadBalancerImported.status === "validated") {
                     self.form.openstack = true;
                 }
-                console.log("terminated1");
-            }).then(function () {
-                console.log("terminated");
-                return getServers();
-            })
-            .catch(function (err){
+            }).then(() => getServers())
+            .catch(err => {
                 self.loadbalancer = null;
-                console.log("error", err);
                 CloudMessage.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
-            })['finally'](function () {
+            }).finally(function () {
                 self.loaders.loadbalancer = false;
             });
         }

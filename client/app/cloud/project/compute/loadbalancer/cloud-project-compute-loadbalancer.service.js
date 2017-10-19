@@ -36,6 +36,35 @@ angular.module("managerApp")
                 }
                 return loadbalancer;
             });
+        }).then(loadbalancer => {
+            if (loadbalancer.frontend && loadbalancer.farm) {
+                loadbalancer.status = "deployed";
+            } else if (!loadbalancer.frontend && !loadbalancer.farm){
+                loadbalancer.status = "available";
+            } else {
+                loadbalancer.status = "custom";
+            }
+            return loadbalancer;
         });
+    }
+
+    self.getLoadbalancersImported = function (serviceName) {
+        return OvhApiCloudProjectIplb.Lexi().query({
+            serviceName : serviceName
+        }).$promise.then(ids => $q.all(
+                _.map(ids, id =>
+                    OvhApiCloudProjectIplb.Lexi().get({
+                        serviceName : serviceName,
+                        id : id,
+                    }).$promise
+                )
+            )
+        ).then(loadbalancers => {
+            var result = {};
+            _.forEach(loadbalancers, lb => {
+                result[lb.iplb] = lb;
+            });
+            return result;
+        })
     }
 });

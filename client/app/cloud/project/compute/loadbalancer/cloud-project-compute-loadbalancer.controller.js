@@ -9,7 +9,6 @@ angular.module("managerApp")
     //Datas
     self.table = {
         loadbalancer : [],
-        loadbalancerFilter: []
     };
 
     // Order link
@@ -28,8 +27,6 @@ angular.module("managerApp")
         },
     };
 
-    var unsubscribeSearchEvent;
-
     function init () {
         self.getLoadbalancers(true);
         // Init locale for order link
@@ -38,7 +35,6 @@ angular.module("managerApp")
     }
 
 
-    //---------ORDER---------
     self.orderBy = function (by) {
         if (by) {
             if (self.order.by === by) {
@@ -89,17 +85,6 @@ angular.module("managerApp")
                     return lb;
                 });
 
-                // Set cloud simplified view status
-                self.table.loadbalancer = _.map(self.table.loadbalancer, lb => {
-                    if (lb.frontend && lb.farm) {
-                        lb.status = "deployed";
-                    } else if (!lb.frontend && !lb.farm){
-                        lb.status = "available";
-                    } else {
-                        lb.status = "custom";
-                    }
-                    return lb;
-                });
                 self.orderBy();
             }).catch( err => {
                 self.table.loadbalancer = null;
