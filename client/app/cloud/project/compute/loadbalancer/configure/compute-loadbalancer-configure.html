@@ -17,7 +17,7 @@
     </div>
     <form data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer !== null" data-ng-submit="CloudProjectComputeLoadbalancerConfigureCtrl.configure()">
         <div class="cui-advanced-options" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'custom'">
-            <a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
+            <a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontends({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
             <p>
                 <strong data-translate="cpc_loadbalancer_key_explain_1"></strong>
             </p>
@@ -25,7 +25,7 @@
             </p>
         </div>
         <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'custom'">
-            <div><a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a></div>
+            <div><a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontends({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a></div>
             <h3 data-translate="cpc_loadbalancer_configure_loadbalancer"></h3>
             <p class="oui-field ">
                 <span class="oui-label" data-translate="cpc_loadbalancer_configure_adresse"></span>
@@ -36,7 +36,7 @@
             <p class="oui-field">
                 <span data-translate="cpc_loadbalancer_configure_protocole" class="oui-label"></span>
                 <span class="oui-label">HTTP</span>
-                <a class="oui-button oui-button_secondary" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontend({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
+                <a class="oui-button oui-button_secondary" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontends({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
             </p>
             <hr />
             <h3 data-translate="cpc_loadbalancer_configure_servers"></h3>

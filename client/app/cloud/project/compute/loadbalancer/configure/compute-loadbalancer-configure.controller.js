@@ -2,10 +2,11 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
     var self = this;
 
     var serviceName = $stateParams.projectId,
-        loadbalancerId = $stateParams.loadbalancerId;
+    loadbalancerId = $stateParams.loadbalancerId;
+    self.loadbalancerId = loadbalancerId;
 
     self.loaders = {
-        loadbalancer : false,
+        loadbalancer : true,
         table : {
             server : false,
         },
@@ -200,33 +201,30 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
     };
 
     function getLoadbalancer(clearCache) {
-        if (!self.loaders.loadbalancer) {
-            self.loaders.loadbalancer = true;
-            if (clearCache) {
-                OvhApiCloudProjectIplb.Lexi().resetQueryCache();
-                OvhApiIpLoadBalancing.Lexi().resetQueryCache();
-            }
-            return $q.all({
-                loadbalancer : CloudProjectComputeLoadbalancerService.getLoadbalancer(loadbalancerId),
-                loadbalancersImported : CloudProjectComputeLoadbalancerService.getLoadbalancersImported(serviceName),
-            }).then(({loadbalancer, loadbalancersImported}) => {
-                self.loadbalancer = loadbalancer;
-
-                self.loadBalancerImported = loadbalancersImported[self.loadbalancer.serviceName];
-                if (!self.loadBalancerImported) {
-                    return;
-                }
-                if (self.loadBalancerImported.status === "validated") {
-                    self.form.openstack = true;
-                }
-            }).then(() => getServers())
-            .catch(err => {
-                self.loadbalancer = null;
-                CloudMessage.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
-            }).finally(function () {
-                self.loaders.loadbalancer = false;
-            });
+        self.loaders.loadbalancer = true;
+        if (clearCache) {
+            OvhApiCloudProjectIplb.Lexi().resetQueryCache();
+            OvhApiIpLoadBalancing.Lexi().resetQueryCache();
         }
+        return $q.all({
+            loadbalancer : CloudProjectComputeLoadbalancerService.getLoadbalancer(loadbalancerId),
+            loadbalancersImported : CloudProjectComputeLoadbalancerService.getLoadbalancersImported(serviceName),
+        }).then(({loadbalancer, loadbalancersImported}) => {
+            self.loadbalancer = loadbalancer;
+
+            self.loadBalancerImported = loadbalancersImported[self.loadbalancer.serviceName];
+            if (!self.loadBalancerImported) {
+                return;
+            }
+            if (self.loadBalancerImported.status === "validated") {
+                self.form.openstack = true;
+            }
+        }).then(() => self.loaders.loadbalancer = false)
+        .then(() => getServers())
+        .catch(err => {
+            self.loadbalancer = null;
+            CloudMessage.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
+        });
     }
 
 

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <translations>
 
-    <translation id="cpc_tab_loadbalancer">Load Balancer</translation>
-
     <translation id="cpc_loadbalancer_order">Commander un Load Balancer</translation>
     <translation id="cpc_loadbalancer_name">Load Balancer</translation>
     <translation id="cpc_loadbalancer_openstack_status">Openstack Status</translation>
