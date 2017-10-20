@@ -133,12 +133,12 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             if(self.loadbalancer.status === "available") {
                 // Create farm and front
                 promise = promise.then(() => OvhApiIpLoadBalancing.Farm().Http().Lexi().post({ serviceName : loadbalancerId}, {
-                   displayName : `PublicCloud-${serviceName}`,
+                   displayName : `PublicCloud`,
                    port : 80,
                    zone : "all",
                }).$promise.then((farm) => self.loadbalancer.farm = farm));
                 promise = promise.then(() => OvhApiIpLoadBalancing.Frontend().Http().Lexi().post({ serviceName : loadbalancerId}, {
-                   displayName : `PublicCloud-${serviceName}`,
+                   displayName : `PublicCloud`,
                    port : 80,
                    zone : "all",
                    defaultFarmId : self.loadbalancer.farm.farmId,
