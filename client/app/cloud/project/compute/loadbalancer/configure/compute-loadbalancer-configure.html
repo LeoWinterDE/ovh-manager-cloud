@@ -48,7 +48,7 @@
                     </tr>
                 </thead>
                 <tbody class="oui-table__body">
-                <tr class="oui-table__row" data-ng-repeat="server in CloudProjectComputeLoadbalancerConfigureCtrl.table.server track by $index"
+                <tr class="oui-table__row" data-ng-repeat="server in CloudProjectComputeLoadbalancerConfigureCtrl.table.server | orderBy:'label' track by $index"
                 data-ng-click="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip] = !CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip]">
                     <td class="oui-table__cell">
                         <input type="checkbox" data-ng-click="$event.stopPropagation()" data-ng-model="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip]"/>

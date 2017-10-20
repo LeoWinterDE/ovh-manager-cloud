@@ -31,6 +31,8 @@
     <translation id="cpc_loadbalancer_configure_openstack_activation">Autoriser mes utilisateurs Openstack à modifier ce Load Balancer.</translation>
     <translation id="cpc_loadbalancer_configure_modify">Appliquer les modifications</translation>
     <translation id="cpc_loadbalancer_configure_cancel">Annuler</translation>
-    <translation id="cpc_loadbalancer_error">Load Balancer error</translation>
+
+    <translation id="cpc_loadbalancer_error">Erreur Load Balancer</translation>
+    <translation id="cpc_server_error">Erreur des serveurs</translation>
 
 </translations>

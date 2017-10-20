@@ -110,9 +110,15 @@ angular.module("managerApp").controller("CloudProjectComputeLoadbalancerConfigur
             self.form.servers = _.mapValues(self.attachedServers, (e) => e ? true : false );
             // Generate array of object type as {ipv4, name}
             self.table.server =
-                _.flatten(_.map(cloudServers, (server) =>
-                    _.map(_.filter(server.ipAddresses, { type : "public", version : 4 }), (adresse) => ({ label : server.name, ip : adresse.ip }))
-                ));
+                _.uniq(
+                    _.union(
+                        _.flatten(_.map(cloudServers, (server) =>
+                            _.map(_.filter(server.ipAddresses, { type : "public", version : 4 }), (adresse) => ({ label : server.name, ip : adresse.ip }))
+                        )),
+                        _.map(self.attachedServers, (server) => ({ label : server.displayName, ip : server.address })),
+                    ),
+                    "ip"
+                );
          }).catch((err) => {
             self.table.server = null;
             CloudMessage.error( [$translate.instant('cpc_server_error'), err.data && err.data.message || ''].join(' '))
