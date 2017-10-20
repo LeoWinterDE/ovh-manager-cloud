@@ -6,7 +6,7 @@
     <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null"
     data-translate="cpc_loadbalancer_error">
     </div>
-    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage && !CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" data-translate="cpc_loadbalancer_configure_updated_message"
+    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage && !CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" data-translate="cpc_loadbalancer_configure_updated_message"
      class="oui-message"></div>
 
     <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" class="cui-advanced-options">
