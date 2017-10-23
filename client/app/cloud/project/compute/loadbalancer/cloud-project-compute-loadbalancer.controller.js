@@ -76,14 +76,15 @@ angular.module("managerApp")
                 _.forEach(laodbalancersImportedArray, function(lb) { loadBalancerImported[lb.iplb] = lb });
 
                 // Set openstack importation status
-                self.table.loadbalancer = _.map(loadbalancers, function (lb) {
-                    if (loadBalancerImported[lb.serviceName]) {
-                        lb.openstack = loadBalancerImported[lb.serviceName].status;
-                    } else {
-                        lb.openstack = "not_imported";
-                    }
-                    return lb;
-                });
+                // self.table.loadbalancer = _.map(loadbalancers, function (lb) {
+                //     if (loadBalancerImported[lb.serviceName]) {
+                //         lb.openstack = loadBalancerImported[lb.serviceName].status;
+                //     } else {
+                //         lb.openstack = "not_imported";
+                //     }
+                //     return lb;
+                // });
+                self.table.loadbalancer = [];
 
                 self.orderBy();
             }).catch( err => {

@@ -2,11 +2,17 @@
     <div class="cui-page__content">
 
         <div ng-if="!CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer && !CloudProjectComputeLoadbalancerCtrl.table.loadbalancer.length"
-             class="oui-box">
-              <h1>Load Balancers</h1>
-              <p>
-                TODO : include this https://www.ovh.com/fr/solutions/load-balancer/
-              </p>
+             class="discover">
+              <div class=""><h3 data-translate="cpc_loadbalancer_discover_title"></h3></div>
+              <div class="body">
+                  <div data-translate="cpc_loadbalancer_discover_body"></div>
+                  <div class="image">
+                      <img src="/assets/images/cloud/loadbalancer/loadbalancer-schema.png" alt="{{cpc_loadbalancer_discover_title | translate}}"/>
+                  </div>
+                  <div class="image">
+                      <a class="oui-button oui-button_primary" data-ng-href="{{CloudProjectComputeLoadbalancerCtrl.urls.website_order.load_balancer[CloudProjectComputeLoadbalancerCtrl.locale]}}" data-translate="cpc_loadbalancer_order"></a>
+                  </div>
+              </div>
         </div>
 
         <div ng-if="CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer"
@@ -16,10 +22,9 @@
 
         <div ng-if="CloudProjectComputeLoadbalancerCtrl.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer.length">
             <a
-                type="button"
                 class="oui-button oui-button_secondary"
                 data-ng-disabled="CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer"
-                ng-href="{{CloudProjectComputeLoadbalancerCtrl.urls.website_order.load_balancer[CloudProjectComputeLoadbalancerCtrl.locale]}}">
+                data-ng-href="{{CloudProjectComputeLoadbalancerCtrl.urls.website_order.load_balancer[CloudProjectComputeLoadbalancerCtrl.locale]}}">
                 <i class="glyphicon glyphicon-plus"></i>
                 <span data-translate="cpc_loadbalancer_order"></span>
             </a>
