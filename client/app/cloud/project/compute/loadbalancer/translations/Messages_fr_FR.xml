@@ -12,6 +12,8 @@
     <translation id="cpc_loadbalancer_openstack_status_created">Non configuré</translation>
     <translation id="cpc_loadbalancer_openstack_status_not_imported">Non configuré</translation>
     <translation id="cpc_loadbalancer_status">État</translation>
+    <translation id="cpc_loadbalancer_actions">Actions</translation>
+    <translation id="cpc_loadbalancer_actions_configure">Configurer</translation>
     <translation id="cpc_loadbalancer_status_custom">Configuration avancée</translation>
     <translation id="cpc_loadbalancer_status_deployed">Déployé</translation>
     <translation id="cpc_loadbalancer_status_available">Non configuré</translation>

@@ -9,14 +9,14 @@
     <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage && !CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" data-translate="cpc_loadbalancer_configure_updated_message"
      class="oui-message"></div>
 
-    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" class="cui-advanced-options">
+    <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length" class="oui-box">
         <h4 data-translate="cpc_loadbalancer_configure_task_waiting"></h4>
         <div data-ng-repeat="task in CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data track by $index" class="compute-loadbalancer-configure-tasks">
             {{task.action}} : <cui-task-progress data-task="task"></cui-task-progress>
         </div>
     </div>
     <form data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer !== null" data-ng-submit="CloudProjectComputeLoadbalancerConfigureCtrl.configure()">
-        <div class="cui-advanced-options" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'custom'">
+        <div class="oui-box" data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'custom'">
             <a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontends({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a>
             <p>
                 <strong data-translate="cpc_loadbalancer_key_explain_1"></strong>
@@ -24,12 +24,12 @@
             <p data-translate="cpc_loadbalancer_key_explain_2">
             </p>
         </div>
-        <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'custom'">
+        <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'custom'">
             <div><a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontends({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a></div>
             <h3 data-translate="cpc_loadbalancer_configure_loadbalancer"></h3>
             <p class="oui-field ">
                 <span class="oui-label" data-translate="cpc_loadbalancer_configure_adresse"></span>
-                <span class="oui-label"><a ng-href="http://{{CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.ipv4}}">{{CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.ipv4}}</a></span>
+                <span class="oui-label"><a data-ng-href="http://{{CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.ipv4}}">{{CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.ipv4}}</a></span>
             </p>
             <hr />
             <h3 data-translate="cpc_loadbalancer_configure_frontend"></h3>
@@ -40,29 +40,21 @@
             </p>
             <hr />
             <h3 data-translate="cpc_loadbalancer_configure_servers"></h3>
-            <p class="cui-advanced-options" data-translate="cpc_loadbalancer_configure_servers_condition"></p>
-            <table class="oui-table" ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.table.server !== null">
-                <thead class="oui-table__header">
-                    <tr class="oui-table__row">
-                        <th class="oui-table__cell"></th><th class="oui-table__cell">Name</th><th class="oui-table__cell">IP</th>
-                    </tr>
-                </thead>
-                <tbody class="oui-table__body">
-                <tr class="oui-table__row" data-ng-repeat="server in CloudProjectComputeLoadbalancerConfigureCtrl.table.server | orderBy:'label' track by $index"
-                data-ng-click="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip] = !CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip]">
-                    <td class="oui-table__cell">
-                        <input type="checkbox" data-ng-click="$event.stopPropagation()" data-ng-model="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[server.ip]"/>
-                    </td>
-                    <td class="oui-table__cell"><span ng-if="server.label">{{server.label}}</span></td>
-                    <td class="oui-table__cell">{{server.ip}}</td>
-                </tr>
-                </tbody>
-            </table>
-            <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.table.server && !CloudProjectComputeLoadbalancerConfigureCtrl.table.server">
+            <p class="oui-box" data-translate="cpc_loadbalancer_configure_servers_condition"></p>
+            <oui-table rows="CloudProjectComputeLoadbalancerConfigureCtrl.table.server"
+                data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.table.server !== null"
+                on-row-click="CloudProjectComputeLoadbalancerConfigureCtrl.toggleServer($row.ip)">
+                <column>
+                    <input type="checkbox" data-ng-click="$event.stopPropagation()" data-ng-model="CloudProjectComputeLoadbalancerConfigureCtrl.form.servers[$row.ip]"/>
+                </column>
+                <column title="'cpc_loadbalancer_server_name' | translate" property="label"></column>
+                <column title="'IP'" property="ip"></column>
+            </oui-table>
+            <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.table.server && !CloudProjectComputeLoadbalancerConfigureCtrl.table.server">
                 <i class="fa fa-bug"></i>
                 <span translate="cpc_server_error"></span>
             </div>
-            <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.table.server" class="text-center">
+            <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.table.server" class="text-center">
                 <oui-loader size="m" class="d-inline-block"></oui-loader>
             </div>
             <hr />
@@ -70,7 +62,7 @@
         </div>
 
         <h3 data-translate="cpc_loadbalancer_configure_openstack"></h3>
-        <p class="cui-advanced-options" data-translate="cpc_loadbalancer_configure_openstack_explanation" data-translate-values="{guideHorizon : CloudProjectComputeLoadbalancerConfigureCtrl.guides.horizon}"></p>
+        <p class="oui-box" data-translate="cpc_loadbalancer_configure_openstack_explanation" data-translate-values="{guideHorizon : CloudProjectComputeLoadbalancerConfigureCtrl.guides.horizon}"></p>
         <div class="oui-field">
             <label class="oui-label">
                 <input type="checkbox" data-ng-model="CloudProjectComputeLoadbalancerConfigureCtrl.form.openstack"/>
@@ -78,11 +70,11 @@
             </label>
         </div>
 
-        <div ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" class="validation">
+        <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" class="validation">
             <button class="oui-button oui-button_primary" data-translate="cpc_loadbalancer_configure_modify" type="submit" data-ng-disabled="CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length"></button>
             <a class="oui-button oui-button_secondary" data-translate="cpc_loadbalancer_configure_cancel" ui-sref="^.loadbalancer"></a>
         </div>
-        <div ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer || CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect">
+        <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.loadbalancer || CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect">
             <oui-loader size="s" class="d-inline-block"></oui-loader>
         </div>
 

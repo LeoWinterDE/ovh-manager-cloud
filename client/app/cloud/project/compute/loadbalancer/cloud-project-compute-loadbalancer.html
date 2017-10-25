@@ -1,7 +1,7 @@
 <div id="cloud-project-compute-loadbalancer" class="row">
     <div class="cui-page__content">
 
-        <div ng-if="!CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer && !CloudProjectComputeLoadbalancerCtrl.table.loadbalancer.length"
+        <div data-ng-if="!CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer && !CloudProjectComputeLoadbalancerCtrl.table.loadbalancer.length"
              class="discover">
               <div class=""><h3 data-translate="cpc_loadbalancer_discover_title"></h3></div>
               <div class="body">
@@ -15,12 +15,12 @@
               </div>
         </div>
 
-        <div ng-if="CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer"
+        <div data-ng-if="CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer"
              class="text-center">
             <oui-loader size="m" class="d-inline-block"></oui-loader>
         </div>
 
-        <div ng-if="CloudProjectComputeLoadbalancerCtrl.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer.length">
+        <div data-ng-if="CloudProjectComputeLoadbalancerCtrl.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer.length">
             <a
                 class="oui-button oui-button_secondary"
                 data-ng-disabled="CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer"
@@ -29,77 +29,14 @@
                 <span data-translate="cpc_loadbalancer_order"></span>
             </a>
 
-            <!-- Loadbalancer TABLE -->
-            <table class="oui-table oui-table_responsive">
-                <thead class="oui-table__headers">
-                    <tr>
-                        <th class="oui-table__header oui-table__cell_sortable" tabindex="0"
-                            data-ng-click="CloudProjectComputeLoadbalancerCtrl.orderBy('serviceName')"
-                            data-ng-class="{'oui-table__cell_sortable-asc oui-table__cell_sorted' : CloudProjectComputeLoadbalancerCtrl.order.by === 'serviceName' && !CloudProjectComputeLoadbalancerCtrl.order.reverse, 'oui-table__cell_sortable-desc oui-table__cell_sorted' : CloudProjectComputeLoadbalancerCtrl.order.by === 'serviceName' && CloudProjectComputeLoadbalancerCtrl.order.reverse}">
-                            <label class="pointer" for="loadbalanceraddname" translate="cpc_loadbalancer_name"></label>
-                        </th>
-                        <th class="oui-table__header" tabindex="0">
-                            <label class="pointer" translate="cpc_loadbalancer_openstack_status"></label>
-                        </th>
-                        <th class="oui-table__header" tabindex="0">
-                            <label class="pointer" translate="cpc_loadbalancer_status"></label>
-                        </th>
-                        <th class="oui-table__header oui-table__cell_action text-center" tabindex="0"
-                            data-ng-click="CloudProjectComputeLoadbalancerCtrl.getLoadbalancers(true)">
-                            <i class="glyphicon glyphicon-refresh"></i>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody data-ng-if="!CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer && CloudProjectComputeLoadbalancerCtrl.table.loadbalancer === null"
-                       class="oui-table__body">
-                    <tr class="oui-table__row">
-                        <td colspan="3" class="text-center">
-                            <i class="fa fa-bug"></i>
-                            <span translate="cpc_loadbalancer_error"></span>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody data-ng-hide="CloudProjectComputeLoadbalancerCtrl.loaders.table.loadbalancer" class="oui-table__body">
-                    <tr data-ng-repeat="loadbalancer in CloudProjectComputeLoadbalancerCtrl.table.loadbalancer | orderBy:CloudProjectComputeLoadbalancerCtrl.order.by:CloudProjectComputeLoadbalancerCtrl.order.reverse track by loadbalancer.serviceName"
-                        class="oui-table__row">
-
-                        <td data-title="{{::'cpc_loadbalancer_name' | translate}}" class="oui-table__cell">
-                            <span>{{loadbalancer.displayName || loadbalancer.serviceName}}
-                            </span>
-                        </td>
-
-                        <td data-title="{{::'cpc_loadbalancer_openstack_status' | translate}}" class="oui-table__cell">
-                            <span data-ng-bind="'cpc_loadbalancer_openstack_status_'+loadbalancer.openstack | translate">
-                            </span>
-                        </td>
-
-                        <td data-title="{{::'cpc_loadbalancer_status' | translate}}" class="oui-table__cell">
-                            <span data-ng-bind="'cpc_loadbalancer_status_'+loadbalancer.status | translate">
-                            </span>
-                        </td>
-
-                        <td data-title="" class="oui-table__cell oui-table__cell_action oui-table__cell_action-menu text-center">
-                            <cui-dropdown-menu>
-                               <cui-dropdown-menu-button>
-                                   <ng-include src="'app/ui-components/icons/button-action.html'"></ng-include>
-                               </cui-dropdown-menu-button>
-                               <cui-dropdown-menu-body>
-                                   <div class="oui-action-menu">
-                                       <a class="no-style oui-action-menu__item oui-action-menu-item" data-ui-sref="iaas.pci-project.compute.loadbalancerConfigure({'loadbalancerId' : loadbalancer.serviceName})">
-                                           <div class="oui-action-menu-item__icon"><i class="glyphicon glyphicon-edit right-space-m8"></i></div>
-                                           <div class="oui-button oui-button_link oui-action-menu-item__label"
-                                               >
-                                               Configurer
-                                           </div>
-                                       </a>
-                                   </div>
-                               </cui-dropdown-menu-body>
-                           </cui-dropdown-menu>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- NO Pagination -->
+            <oui-table rows="CloudProjectComputeLoadbalancerCtrl.table.loadbalancer">
+                <column title="'cpc_loadbalancer_name' | translate">{{$row.displayName || $row.serviceName}}</column>
+                <column title="'cpc_loadbalancer_openstack_status' | translate">{{'cpc_loadbalancer_openstack_status_'+$row.openstack | translate}}</column>
+                <column title="'cpc_loadbalancer_status' | translate">{{'cpc_loadbalancer_status_'+$row.status | translate}}</column>
+                <column title="'cpc_loadbalancer_actions' | translate" class="oui-table__cell_action oui-table__cell_action-menu"
+                        template="CloudProjectComputeLoadbalancerCtrl.actionTemplate()">
+                </column>
+            </oui-table>
 
         </div>
     </div>

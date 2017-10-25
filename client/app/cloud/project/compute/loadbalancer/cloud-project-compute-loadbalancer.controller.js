@@ -1,99 +1,103 @@
-"use strict";
+class CloudProjectComputeLoadbalancerCtrl {
+    constructor ($q, $translate, $stateParams, CloudProjectComputeLoadbalancerService, OvhApiCloudProjectIplb, OvhApiIpLoadBalancing, CloudMessage, OvhApiMe, URLS) {
+        this.$q = $q;
+        this.CloudProjectComputeLoadbalancerService = CloudProjectComputeLoadbalancerService;
+        this.OvhApiCloudProjectIplb = OvhApiCloudProjectIplb;
+        this.OvhApiIpLoadBalancing = OvhApiIpLoadBalancing;
+        this.CloudMessage = CloudMessage;
+        this.OvhApiMe = OvhApiMe;
 
-angular.module("managerApp")
-  .controller("CloudProjectComputeLoadbalancerCtrl", function ($q, $scope, $translate, CloudProjectComputeLoadbalancerService, OvhApiCloudProjectIplb, OvhApiIpLoadBalancing, ControllerHelper, CloudMessage, $stateParams, OvhApiMe, URLS) {
+        this.serviceName = $stateParams.projectId;
 
-    var self = this,
-        serviceName = $stateParams.projectId;
+        // Datas
+        this.table = {
+            loadbalancer: []
+        };
 
-    //Datas
-    self.table = {
-        loadbalancer : [],
-    };
-
-    // Order link
-    self.urls = URLS;
-    self.locale = "";
-
-    self.order = {
-        by      : 'serviceName',
-        reverse : false
-    };
-
-    //Loader during Datas requests
-    self.loaders = {
-        table : {
-            loadbalancer : false
-        },
-    };
-
-    function init () {
-        self.getLoadbalancers(true);
+        // Order link
+        this.urls = URLS;
+        this.locale = "";
         // Init locale for order link
-        OvhApiMe.Lexi().get().$promise.then((user) => self.locale = user.ovhSubsidiary.toUpperCase());
+        OvhApiMe.Lexi().get().$promise.then(user => { this.locale = user.ovhSubsidiary.toUpperCase(); });
+
+        // Loader during Datas requests
+        this.loaders = {
+            table: {
+                loadbalancer: false
+            }
+        };
 
     }
 
+    $onInit () {
+        this.getLoadbalancers(true);
+    }
 
-    self.orderBy = function (by) {
-        if (by) {
-            if (self.order.by === by) {
-                self.order.reverse = !self.order.reverse;
-            } else {
-                self.order.by = by;
-            }
-        }
-    };
-
-
-    self.getLoadbalancers = function (clearCache) {
-        if (!self.loaders.table.loadbalancer) {
-            self.loaders.table.loadbalancer = true;
+    getLoadbalancers (clearCache) {
+        if (!this.loaders.table.loadbalancer) {
+            this.loaders.table.loadbalancer = true;
             if (clearCache) {
-                OvhApiCloudProjectIplb.Lexi().resetQueryCache();
-                OvhApiIpLoadBalancing.Lexi().resetQueryCache();
+                this.OvhApiCloudProjectIplb.Lexi().resetQueryCache();
+                this.OvhApiIpLoadBalancing.Lexi().resetQueryCache();
             }
-            $q.all({
-                loadbalancers :
-                    OvhApiIpLoadBalancing.Lexi().query().$promise.then((response) => $q.all(
-                        _.map(response, CloudProjectComputeLoadbalancerService.getLoadbalancer)
-                    )),
-                laodbalancersImportedArray :
-                    OvhApiCloudProjectIplb.Lexi().query({
-                        serviceName : serviceName
-                    }).$promise.then(ids => $q.all(
-                            _.map(ids, id =>
-                                OvhApiCloudProjectIplb.Lexi().get({
-                                    serviceName : serviceName,
-                                    id : id,
-                                }).$promise
-                            )
-                        )
+            this.$q.all({
+                loadbalancers:
+                this.OvhApiIpLoadBalancing.Lexi().query().$promise.then(response => this.$q.all(
+                    _.map(response, id => this.CloudProjectComputeLoadbalancerService.getLoadbalancer(id))
+                )),
+                laodbalancersImportedArray:
+                this.OvhApiCloudProjectIplb.Lexi().query({
+                    serviceName: this.serviceName
+                }).$promise.then(ids => this.$q.all(
+                    _.map(ids, id =>
+                        this.OvhApiCloudProjectIplb.Lexi().get({
+                            serviceName: this.serviceName,
+                            id
+                        }).$promise
                     )
-            }).then(({loadbalancers, laodbalancersImportedArray}) => {
-                // Create a map of imported loadbalancers
-                var loadBalancerImported = {}
-                _.forEach(laodbalancersImportedArray, function(lb) { loadBalancerImported[lb.iplb] = lb });
+                )
+                )
+            }).then(({ loadbalancers, laodbalancersImportedArray }) => {
+            // Create a map of imported loadbalancers
+                const loadBalancerImported = {};
+                _.forEach(laodbalancersImportedArray, lb => { loadBalancerImported[lb.iplb] = lb; });
 
                 // Set openstack importation status
-                // self.table.loadbalancer = _.map(loadbalancers, function (lb) {
-                //     if (loadBalancerImported[lb.serviceName]) {
-                //         lb.openstack = loadBalancerImported[lb.serviceName].status;
-                //     } else {
-                //         lb.openstack = "not_imported";
-                //     }
-                //     return lb;
-                // });
-                self.table.loadbalancer = [];
-
-                self.orderBy();
-            }).catch( err => {
-                self.table.loadbalancer = null;
-                CloudMessage.error( [$translate.instant('cpc_loadbalancer_error'), err.data && err.data.message || ''].join(' '));
-            }).finally(() => self.loaders.table.loadbalancer = false);
+                this.table.loadbalancer = _.map(loadbalancers, lb => {
+                    if (loadBalancerImported[lb.serviceName]) {
+                        lb.openstack = loadBalancerImported[lb.serviceName].status;
+                    } else {
+                        lb.openstack = "not_imported";
+                    }
+                    return lb;
+                });
+            }).catch(err => {
+                this.table.loadbalancer = null;
+                this.CloudMessage.error([this.$translate.instant("cpc_loadbalancer_error"), err.data && err.data.message || ""].join(" "));
+            }).finally(() => { this.loaders.table.loadbalancer = false; });
         }
-    };
+    }
 
-    init();
+    actionTemplate () {
+        return `
+                <cui-dropdown-menu>
+                   <cui-dropdown-menu-button>
+                       <ng-include src="'app/ui-components/icons/button-action.html'"></ng-include>
+                   </cui-dropdown-menu-button>
+                   <cui-dropdown-menu-body>
+                       <div class="oui-action-menu">
+                           <div class="oui-action-menu__item oui-action-menu-item">
+                                   <div class="oui-action-menu-item__icon"><i class="glyphicon glyphicon-edit right-space-m8"></i></div>
+                                   <a class="oui-button oui-button_link oui-action-menu-item__label"
+                                      data-ui-sref="iaas.pci-project.compute.loadbalancerConfigure({'loadbalancerId' : $row.serviceName})"
+                                      data-translate="cpc_loadbalancer_actions_configure">
+                                   </a>
+                            </div>
+                       </div>
+                   </cui-dropdown-menu-body>
+               </cui-dropdown-menu>
+        `;
+    }
+}
 
-});
+angular.module("managerApp").controller("CloudProjectComputeLoadbalancerCtrl", CloudProjectComputeLoadbalancerCtrl);
