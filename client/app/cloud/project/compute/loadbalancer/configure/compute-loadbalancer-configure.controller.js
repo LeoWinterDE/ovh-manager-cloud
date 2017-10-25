@@ -261,7 +261,6 @@ class CloudProjectComputeLoadbalancerConfigureCtrl {
     }
 
     toggleServer (ip) {
-        console.log("receive click");
         this.form.servers[ip] = !this.form.servers[ip];
     }
 
