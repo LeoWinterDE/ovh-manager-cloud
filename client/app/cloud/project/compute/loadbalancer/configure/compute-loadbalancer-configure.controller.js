@@ -87,29 +87,6 @@ class CloudProjectComputeLoadbalancerConfigureCtrl {
         };
     }
 
-    // Get servers of the default default farm of the frontend
-    getAttachedServers () {
-        if (!this.loadbalancer.farm) {
-            return Promise.resolve([]);
-        }
-        return this.OvhApiIpLoadBalancing.Farm().Http().Server().Lexi()
-            .query({
-                serviceName: this.loadbalancerId,
-                farmId: this.loadbalancer.farm.farmId
-            }).$promise
-            .then(serverIds =>
-                this.$q.all(
-                    _.map(serverIds, serverId => this.OvhApiIpLoadBalancing.Farm().Http().Server().Lexi()
-                        .get({
-                            serviceName: this.loadbalancerId,
-                            farmId: this.loadbalancer.farm.farmId,
-                            serverId
-                        }).$promise
-                    )
-                )
-            );
-    }
-
     // Get cloud servers to add in the loadbalancer
     getServers () {
         if (this.loaders.table.server) {
@@ -118,7 +95,7 @@ class CloudProjectComputeLoadbalancerConfigureCtrl {
         this.loaders.table.server = true;
         return this.$q.all({
             cloudServers: this.OvhApiCloudProject.Instance().Lexi().query({ serviceName: this.serviceName }).$promise,
-            attachedServers: this.getAttachedServers()
+            attachedServers: this.CloudProjectComputeLoadbalancerService.getAttachedServers(this.loadbalancer),
         }).then(({ cloudServers, attachedServers }) => {
             this.attachedServers = {};
             _.forEach(attachedServers, attachedServer => {

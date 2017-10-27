@@ -66,6 +66,30 @@ class CloudProjectComputeLoadbalancerService {
             return result;
         });
     }
+
+    // Get servers of the default default farm of the frontend
+    // loadbalancer must be generated from function this.getLoadbalancer(id)
+    getAttachedServers (loadbalancer) {
+        if (!loadbalancer.farm) {
+            return Promise.resolve([]);
+        }
+        return this.OvhApiIpLoadBalancing.Farm().Http().Server().Lexi()
+            .query({
+                serviceName: loadbalancer.serviceName,
+                farmId: loadbalancer.farm.farmId
+            }).$promise
+            .then(serverIds =>
+                this.$q.all(
+                    _.map(serverIds, serverId => this.OvhApiIpLoadBalancing.Farm().Http().Server().Lexi()
+                        .get({
+                            serviceName: loadbalancer.serviceName,
+                            farmId: loadbalancer.farm.farmId,
+                            serverId
+                        }).$promise
+                    )
+                )
+            );
+    }
 }
 
 angular.module("managerApp").service("CloudProjectComputeLoadbalancerService", CloudProjectComputeLoadbalancerService);

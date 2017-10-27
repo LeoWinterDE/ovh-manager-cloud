@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <translations>
-   <translation id="cpc_tab_infra" qtlid="246910">Infra</translation>
+   <translation id="cpc_tab_infra" qtlid="246910">Infra.</translation>
    <translation id="cpc_tab_snapshot" qtlid="170343">Backups</translation>
    <translation id="cpc_tab_volume" qtlid="246923">Extra disks</translation>
    <translation id="cpc_tab_ssh" qtlid="104830">SSH-key</translation>
