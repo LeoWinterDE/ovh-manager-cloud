@@ -95,7 +95,7 @@ class CloudProjectComputeLoadbalancerConfigureCtrl {
         this.loaders.table.server = true;
         return this.$q.all({
             cloudServers: this.OvhApiCloudProject.Instance().Lexi().query({ serviceName: this.serviceName }).$promise,
-            attachedServers: this.CloudProjectComputeLoadbalancerService.getAttachedServers(this.loadbalancer),
+            attachedServers: this.CloudProjectComputeLoadbalancerService.getAttachedServers(this.loadbalancer)
         }).then(({ cloudServers, attachedServers }) => {
             this.attachedServers = {};
             _.forEach(attachedServers, attachedServer => {
@@ -131,7 +131,7 @@ class CloudProjectComputeLoadbalancerConfigureCtrl {
 
         // Configure the HTTP(80) loadbalancer
         const configLoadBalancer = _.values(this.form.servers).length && _.reduce(this.form.servers, (res, value) => res && value, true) || _.values(this.attachedServers).length > 0;
-        if (this.loadbalancer.status !== "custom" && configLoadBalancer) {
+        if (this.loadbalancer.status !== "custom" && this.loadbalancer.status !== "unavailable" && configLoadBalancer) {
             if (this.loadbalancer.status === "available") {
                 // Create farm and front
                 configurePromise = configurePromise.then(() => this.OvhApiIpLoadBalancing.Farm().Http().Lexi().post({ serviceName: this.loadbalancerId }, {

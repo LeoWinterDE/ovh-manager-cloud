@@ -1,4 +1,4 @@
-<div id="compute-loadbalancer-configure">
+<div id="compute-loadbalancer-configure" class="cui-page__content">
     <cui-back-link data-state="^.loadbalancer"
                    data-state-params="{ projectId: CloudProjectComputeLoadbalancerConfigureCtrl.$stateParams.serviceName}"
                    data-text="'cpc_loadbalancer_back' | translate"></cui-back-link>
@@ -6,7 +6,10 @@
     <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer" class="text-center">
         <oui-loader size="m" class="d-inline-block"></oui-loader>
     </div>
-    <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null"
+    <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer === null || CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'unavailable'"
+    data-translate="cpc_loadbalancer_error">
+    </div>
+    <div data-ng-if="!CloudProjectComputeLoadbalancerConfigureCtrl.loaders.loadbalancer && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status === 'unavailable'"
     data-translate="cpc_loadbalancer_error">
     </div>
     <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.toggle.updatedMessage && !CloudProjectComputeLoadbalancerConfigureCtrl.tasks.data.length && !CloudProjectComputeLoadbalancerConfigureCtrl.loaders.form.redirect" data-translate="cpc_loadbalancer_configure_updated_message"
@@ -27,7 +30,7 @@
             <p data-translate="cpc_loadbalancer_key_explain_2">
             </p>
         </div>
-        <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'custom'">
+        <div data-ng-if="CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'custom' && CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancer.status !== 'unavailable'">
             <div><a class="oui-button oui-button_secondary pull-right" data-translate="cpc_loadbalancer_configure_advanced" data-ui-sref="network.iplb.detail.frontends({'serviceName': CloudProjectComputeLoadbalancerConfigureCtrl.loadbalancerId})"></a></div>
             <h3 data-translate="cpc_loadbalancer_configure_loadbalancer"></h3>
             <p class="oui-field ">

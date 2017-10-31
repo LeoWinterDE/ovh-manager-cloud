@@ -86,13 +86,20 @@ class CloudProjectComputeLoadbalancerCtrl {
                    </cui-dropdown-menu-button>
                    <cui-dropdown-menu-body>
                        <div class="oui-action-menu">
-                           <div class="oui-action-menu__item oui-action-menu-item">
+                           <div class="oui-action-menu__item oui-action-menu-item" ng-if="$row.status !== 'unavailable'">
                                    <div class="oui-action-menu-item__icon"><i class="glyphicon glyphicon-edit right-space-m8"></i></div>
                                    <a class="oui-button oui-button_link oui-action-menu-item__label"
                                       data-ui-sref="iaas.pci-project.compute.loadbalancerConfigure({'loadbalancerId' : $row.serviceName})"
                                       data-translate="cpc_loadbalancer_actions_configure">
                                    </a>
                             </div>
+                            <div class="oui-action-menu__item oui-action-menu-item" ng-if="$row.status === 'unavailable'">
+                                    <div class="oui-action-menu-item__icon"><i class="glyphicon glyphicon-edit right-space-m8"></i></div>
+                                    <a class="oui-button oui-button_link oui-action-menu-item__label"
+                                       data-ui-sref="network.iplb.detail.home({'serviceName': $row.serviceName})"
+                                       data-translate="cpc_loadbalancer_configure_advanced">
+                                    </a>
+                             </div>
                        </div>
                    </cui-dropdown-menu-body>
                </cui-dropdown-menu>

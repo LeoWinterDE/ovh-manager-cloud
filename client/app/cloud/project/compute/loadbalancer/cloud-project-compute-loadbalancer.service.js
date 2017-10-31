@@ -9,9 +9,12 @@ class CloudProjectComputeLoadbalancerService {
         // Get loadbalancer
         return this.OvhApiIpLoadBalancing.Lexi().get({
             serviceName: id
-        }).$promise.then(loadbalancer =>
-        // Find the frontend http 80 if exists
-            this.OvhApiIpLoadBalancing.Frontend().Http().Lexi().query({
+        }).$promise.then(loadbalancer => {
+            if (loadbalancer.state !== "ok") {
+                return loadbalancer;
+            }
+            // Find the frontend http 80 if exists
+            return this.OvhApiIpLoadBalancing.Frontend().Http().Lexi().query({
                 serviceName: id,
                 port: 80
             }).$promise.then(frontendIds =>
@@ -34,12 +37,17 @@ class CloudProjectComputeLoadbalancerService {
                     loadbalancer.farm = farm;
                 }
                 return loadbalancer;
-            })
+            });
+        }
         ).then(loadbalancer => {
-            if (loadbalancer.frontend && loadbalancer.farm) {
+            if (loadbalancer.state !== "ok") {
+                loadbalancer.status = "unavailable";
+            } else if (loadbalancer.frontend && loadbalancer.farm) {
                 loadbalancer.status = "deployed";
             } else if (!loadbalancer.frontend && !loadbalancer.farm) {
                 loadbalancer.status = "available";
+            } else if (loadbalancer.state !== "ok") {
+                loadbalancer.status = "unavailable";
             } else {
                 loadbalancer.status = "custom";
             }

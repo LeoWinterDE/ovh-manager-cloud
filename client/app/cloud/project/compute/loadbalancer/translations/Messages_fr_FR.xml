@@ -16,6 +16,7 @@
     <translation id="cpc_loadbalancer_actions">Actions</translation>
     <translation id="cpc_loadbalancer_actions_configure">Configurer</translation>
     <translation id="cpc_loadbalancer_status_custom">Configuration avancée</translation>
+    <translation id="cpc_loadbalancer_status_unavailable">Indisponible</translation>
     <translation id="cpc_loadbalancer_status_deployed">Déployé</translation>
     <translation id="cpc_loadbalancer_status_available">Non configuré</translation>
 
